@@ -1,0 +1,98 @@
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+const cases = {
+  "Market Entry": [
+    {
+      prompt: "A U.S. beverage company wants to enter the Japanese market. What factors would you consider?",
+      feedback: "Good frameworks include market sizing, competition, distribution, and cultural fit."
+    },
+    {
+      prompt: "Estimate the size of the Japanese soft drink market.",
+      feedback: "Try using population × consumption per capita × price per unit."
+    },
+    {
+      prompt: "What are potential entry modes for this company?",
+      feedback: "You could mention joint ventures, acquisitions, or organic growth."
+    }
+  ],
+  "Profitability": [
+    {
+      prompt: "A hotel chain reports a 20% drop in profits this year. How would you approach this case?",
+      feedback: "Start by breaking down revenue and cost components."
+    },
+    {
+      prompt: "Revenue has stayed constant. What cost areas would you investigate?",
+      feedback: "Look at fixed vs. variable costs—staff, maintenance, marketing, etc."
+    },
+    {
+      prompt: "Costs increased due to higher energy bills. How can the client respond?",
+      feedback: "Consider negotiating rates, investing in efficiency, or adjusting pricing."
+    }
+  ]
+};
+
+export default function CaseInterviewSimulator() {
+  const [caseType, setCaseType] = useState("");
+  const [step, setStep] = useState(0);
+  const [answer, setAnswer] = useState("");
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  const currentCase = cases[caseType];
+  const currentPrompt = currentCase ? currentCase[step] : null;
+
+  const handleNext = () => {
+    setShowFeedback(false);
+    setAnswer("");
+    setStep(prev => prev + 1);
+  };
+
+  const restart = () => {
+    setStep(0);
+    setAnswer("");
+    setShowFeedback(false);
+    setCaseType("");
+  };
+
+  return (
+    <div className="p-6 max-w-2xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Case Interview Simulator</h1>
+
+      {!caseType && (
+        <div className="space-y-2">
+          <p className="mb-2">Choose a case type:</p>
+          {Object.keys(cases).map((type) => (
+            <Button key={type} onClick={() => setCaseType(type)}>{type}</Button>
+          ))}
+        </div>
+      )}
+
+      {caseType && currentPrompt && (
+        <Card className="mt-4">
+          <CardContent className="space-y-4 p-4">
+            <p className="font-medium">{currentPrompt.prompt}</p>
+            <Input
+              placeholder="Your response"
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+            />
+            <div className="space-x-2">
+              <Button onClick={() => setShowFeedback(true)}>Submit</Button>
+              {showFeedback && (
+                <span className="text-sm text-gray-700">Feedback: {currentPrompt.feedback}</span>
+              )}
+            </div>
+            {step < currentCase.length - 1 && (
+              <Button variant="secondary" onClick={handleNext}>Next</Button>
+            )}
+            {step === currentCase.length - 1 && (
+              <Button variant="destructive" onClick={restart}>Restart</Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
